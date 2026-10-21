@@ -11,3 +11,15 @@ packages:
 allowBuilds:
   '@parcel/watcher': false
   esbuild: true
+
+# vite 6.4.5 是安全修复版本，比 pnpm 的最小发布年龄门槛新，显式放行。
+minimumReleaseAgeExclude:
+  - vite@6.4.5
+
+# 安全补丁（2026-10-22 / pnpm audit）：把受 advisory 影响的传递依赖钉到已修复版本。
+# 只做 patch/minor 级别，且都必须与直接依赖的版本约束兼容。
+overrides:
+  '@vue/server-renderer@<3.5.42': '3.5.44'
+  'js-yaml@<3.15.2': '3.15.2'
+  'brace-expansion@>=2.0.0 <2.1.7': '2.1.7'
+  'source-map-js@<1.2.2': '1.2.2'

@@ -1,0 +1,9 @@
+# Cloudflare Pages 静态站点安全响应头（安全补丁 2026-10-22）
+# 只放不会破坏现有页面的头。CSP 暂不启用：页面依赖 giscus 第三方 iframe 与
+# 内联 critical CSS / 启动帘幕脚本，需要单独评估后再上，避免直接打挂页面。
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Strict-Transport-Security: max-age=15552000; includeSubDomains

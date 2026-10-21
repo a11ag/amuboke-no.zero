@@ -1,5 +1,4 @@
 import { ViteSSG, type ViteSSGOptions } from 'vite-ssg'
-import { createHead } from '@unhead/vue'
 import App from './app.vue'
 import { POSTS, postRoute } from './content/build-time-index'
 import { vuetify } from './plugins/vuetify'
@@ -15,12 +14,9 @@ export const createApp = ViteSSG(
   App,
   { routes, scrollBehavior },
   ({ app, router, isClient }) => {
-    // AGENTS.md §7: 创建 head 实例并注册到 app
-    // @unhead/vue 会在 SSR 阶段把 useHead() 的标签注入到 HTML，
-    // 客户端hydration 后自动同步，无需额外工作。
-    const head = createHead()
-    app.use(head)
-
+    // 文档 head 由 vite-ssg 自己创建并安装（ViteSSG 默认 useHead: true）。
+    // 这里不再重复 createHead()：重复安装两个 unhead 实例既冗余，也把项目
+    // 的直接依赖钉在了存在 advisory 的 unhead v1 上（安全补丁 2026-10-22）。
     app.use(vuetify)
 
     // Register scroll restoration + SEO guard
