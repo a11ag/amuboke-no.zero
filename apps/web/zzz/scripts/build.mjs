@@ -329,13 +329,15 @@ function classicSlug(slug) {
 function classicHrefFor(urlPath = '') {
   const p = String(urlPath).replace(/^\/+/, '')
   if (!p || p === 'index.html' || p === '404.html') return '/'
-  if (p === 'about/') return '/posts/about-me'
-  if (p === 'archive/') return '/posts'
+  // 经典站的路由在 Cloudflare Pages 上以目录形式发布，统一带尾斜杠，
+  // 避免 308 跳转把切换动画的导航变成一次额外跳转。
+  if (p === 'about/') return '/posts/about-me/'
+  if (p === 'archive/') return '/posts/'
   let m = p.match(/^posts\/([^/]+)\/$/)
-  if (m) return '/posts/' + encodeURIComponent(classicSlug(decodeURIComponent(m[1])))
-  if (/^(gallery|listen)\/[^/]+\/$/.test(p)) return '/' + p.replace(/\/+$/, '')
-  if (/^projects\/[^/]+\/$/.test(p)) return '/projects'
-  return '/' + p.replace(/\/+$/, '')
+  if (m) return '/posts/' + encodeURIComponent(classicSlug(decodeURIComponent(m[1]))) + '/'
+  if (/^(gallery|listen)\/[^/]+\/$/.test(p)) return '/' + p.replace(/\/+$/, '') + '/'
+  if (/^projects\/[^/]+\/$/.test(p)) return '/projects/'
+  return '/' + p.replace(/\/+$/, '') + '/'
 }
 // 主题切换落地页：读取上一页写进 sessionStorage 的圆心，注入跨文档 View Transition 的
 // 圆形裁切动画。必须放在 <head> 里同步执行，动画才能在首帧生效。
@@ -359,6 +361,8 @@ if(typeof d.sy==='number'&&d.sy>0){addEventListener('pagereveal',function(){wind
 var cleanup=function(){var s=document.getElementById('amu-vt-style');if(s)s.remove();};
 addEventListener('pagereveal',function(e){var vt=e.viewTransition;if(vt)vt.finished.finally(cleanup);},{once:true});
 setTimeout(cleanup,2600);
+var settle=function(){var els=document.querySelectorAll('.reveal');for(var i=0;i<els.length;i++){var el=els[i];el.style.opacity='1';el.style.transform='none';el.style.transition='none';}};
+if(document.readyState==='loading'){addEventListener('DOMContentLoaded',settle,{once:true});}else{settle();}
 sessionStorage.removeItem('amu-theme-switch');
 }catch(e){}})();`
 

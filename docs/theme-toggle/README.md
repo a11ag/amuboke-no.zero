@@ -29,3 +29,15 @@
 - `transition-zzz-to-classic.jpg`：ZZZ → 经典站，同一几何圆心反向揭幕。
 
 两张都是过渡中的真实截帧（不是合成图）。经典站按钮 `ZZZ`，ZZZ 主题按钮 `CLASSIC`。
+
+## 2026-11-16 跟进：切换动画可见性
+
+线上反馈“第一次切 ZZZ 没特效、切回经典稳定没特效”。真机复测发现跨文档 VT 其实创建了，
+但目标页自己的入场动画（经典站 home-rise、ZZZ 的 reveal）让快照里的内容还在透明状态，
+圆形裁切里看到的是一张“还没画完”的页面；另外从 ZZZ 子页切回时目标地址少了尾斜杠，
+会多一次 308。修复后：
+
+- `transition-before-live-z2c.jpg`：修复前线上反向切换的截帧，经典页内容仍在入场（发灰）。
+- `transition-after-fix-z2c.jpg`：落地页把入场动画钉到终态后，圆形里的经典页内容完整。
+- `transition-after-fix-c2z.jpg`：第一次经典 → ZZZ，圆形里的 ZZZ 内容完整。
+- `transition-after-fix-c2z-throttled.jpg`：1.5 Mbps / 180 ms 限速下的第一次切换，仍能看到完整扩散。

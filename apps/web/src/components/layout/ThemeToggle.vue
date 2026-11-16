@@ -24,6 +24,8 @@ function onIntent(): void {
     title="切换到 ZZZ 主题"
     @click="onClick"
     @pointerenter="onIntent"
+    @pointerdown="onIntent"
+    @touchstart.passive="onIntent"
     @focus="onIntent"
   >
     <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7">

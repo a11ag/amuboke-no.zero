@@ -28,6 +28,25 @@
             '::view-transition-new(root){animation:amu-theme-reveal 560ms cubic-bezier(.22,1,.36,1) both}' +
             '@keyframes amu-theme-reveal{from{clip-path:circle(0 at var(--amu-vt-x) var(--amu-vt-y))}to{clip-path:circle(var(--amu-vt-r) at var(--amu-vt-x) var(--amu-vt-y))}}'
           document.head.appendChild(style)
+          // 主题切过来是为了看“圆形裁切里的新页面”，不是看首页自己的入场动画：
+          // 把 home-rise 系列直接钉在终态，避免快照里的内容是透明/半透明。
+          const settle = () => {
+            const selectors = [
+              '.home-page__hero', '.home-page__brand', '.home-page__tagline',
+              '.home-page__quote-zh', '.home-page__quote-en',
+              '.home-page__channels', '.home-page__stats'
+            ].join(',')
+            document.querySelectorAll(selectors).forEach((el) => {
+              el.style.animation = 'none'
+              el.style.opacity = '1'
+              el.style.transform = 'none'
+            })
+          }
+          if (document.readyState === 'loading') {
+            addEventListener('DOMContentLoaded', settle, { once: true })
+          } else {
+            settle()
+          }
           if (typeof data.sy === 'number' && data.sy > 0) {
             addEventListener('pagereveal', () => window.scrollTo(0, data.sy), { once: true })
           }
