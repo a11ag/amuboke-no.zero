@@ -1114,8 +1114,11 @@ write('search-index.json', searchIndex())
 
 // 只拷贝主题自己的 css/js/fonts/img；图片与经典站共用 public/ 下的同一批文件，
 // 切主题时直接命中缓存，不重复下载。
+// Git 不跟踪空目录：img/ 里只有生成出来的 favicon，从干净 checkout 构建时
+// 这个源目录可能不存在。缺哪个就跳过哪个，后面的 favicon 写入会自己建目录。
 for (const sub of ['css', 'fonts', 'img', 'js']) {
-  copyDir(path.join(SITE_DIR, 'assets', sub), path.join(OUT, 'assets', sub))
+  const src = path.join(SITE_DIR, 'assets', sub)
+  if (fs.existsSync(src)) copyDir(src, path.join(OUT, 'assets', sub))
 }
 // favicon
 fs.mkdirSync(path.join(OUT, 'assets/img'), { recursive: true })
