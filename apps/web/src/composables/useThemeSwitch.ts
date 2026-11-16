@@ -112,13 +112,36 @@ export function switchToZzz(button: HTMLElement): void {
 }
 
 /** 悬停 / 聚焦时预取目标页 HTML，让圆形扩散开始前内容就绪（不提前加载图片）。 */
+const ZZZ_CRITICAL_ASSETS: Array<{ href: string; as: 'style' | 'script' | 'font' }> = [
+  { href: '/zzz/assets/css/zzz-tokens.css', as: 'style' },
+  { href: '/zzz/assets/css/site.css', as: 'style' },
+  { href: '/zzz/assets/css/theme-bridge.css', as: 'style' },
+  { href: '/zzz/assets/js/site.js', as: 'script' },
+  { href: '/zzz/assets/js/theme-bridge.js', as: 'script' },
+  { href: '/zzz/assets/fonts/anton-latin.woff2', as: 'font' },
+  { href: '/zzz/assets/fonts/archivo-black-latin.woff2', as: 'font' }
+]
+let zzzAssetsPrefetched = false
+
+/** 悬停 / 聚焦 / 按下时预取目标 HTML 和 ZZZ 的阻塞资源，让第一次切换也够快。 */
 export function prefetchZzz(): void {
   if (typeof document === 'undefined') return
   const url = toZzzPath(window.location.pathname)
-  if (document.querySelector(`link[rel="prefetch"][href="${url}"]`)) return
-  const link = document.createElement('link')
-  link.rel = 'prefetch'
-  link.as = 'document'
-  link.href = url
-  document.head.appendChild(link)
+  if (!document.querySelector(`link[rel="prefetch"][href="${url}"]`)) {
+    const link = document.createElement('link')
+    link.rel = 'prefetch'
+    link.as = 'document'
+    link.href = url
+    document.head.appendChild(link)
+  }
+  if (zzzAssetsPrefetched) return
+  zzzAssetsPrefetched = true
+  for (const asset of ZZZ_CRITICAL_ASSETS) {
+    const link = document.createElement('link')
+    link.rel = 'prefetch'
+    link.as = asset.as
+    link.href = asset.href
+    if (asset.as === 'font') link.crossOrigin = 'anonymous'
+    document.head.appendChild(link)
+  }
 }

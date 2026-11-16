@@ -25,16 +25,18 @@
   // 当前 /zzz/... 地址 → 经典站同义路由
   function classicPath(pathname) {
     let p = pathname.replace(/^\/zzz(?=\/|$)/, '') || '/'
-    if (p === '/about/' || p === '/about') return '/posts/about-me'
-    if (p === '/archive/' || p === '/archive') return '/posts'
+    if (p === '/') return '/'
+    // 经典站是目录式静态页，统一带尾斜杠，避免 Cloudflare Pages 的 308。
+    if (p === '/about/' || p === '/about') return '/posts/about-me/'
+    if (p === '/archive/' || p === '/archive') return '/posts/'
     let m = p.match(/^\/posts\/([^/]+)\/?$/)
     if (m) {
       const slug = decodeURIComponent(m[1])
-      return '/posts/' + encodeURIComponent(CLASSIC_POST_SLUGS[slug] || slug)
+      return '/posts/' + encodeURIComponent(CLASSIC_POST_SLUGS[slug] || slug) + '/'
     }
-    if (/^\/(gallery|listen)\/[^/]+\/?$/.test(p)) return p.replace(/\/+$/, '')
-    if (/^\/projects\/[^/]+\/?$/.test(p)) return '/projects'
-    return p.replace(/\/+$/, '') || '/'
+    if (/^\/(gallery|listen)\/[^/]+\/?$/.test(p)) return p.replace(/\/+$/, '') + '/'
+    if (/^\/projects\/[^/]+\/?$/.test(p)) return '/projects/'
+    return p.replace(/\/+$/, '') + '/'
   }
 
   function getSwitchPayload(btn, to) {
@@ -115,11 +117,30 @@
     const prefetch = () => {
       if (prefetched) return
       prefetched = true
-      const link = document.createElement('link')
-      link.rel = 'prefetch'
-      link.as = 'document'
-      link.href = target
-      document.head.appendChild(link)
+      const docLink = document.createElement('link')
+      docLink.rel = 'prefetch'
+      docLink.as = 'document'
+      docLink.href = target
+      document.head.appendChild(docLink)
+      // 目标页是带 hash 的 Vue bundle：先读 HTML 再预热 css/js，
+      // 这样第一次切回经典站时新页面已经就绪，圆形动画不会被慢加载拖成“没效果”。
+      fetch(target, { credentials: 'same-origin' })
+        .then((res) => res.text())
+        .then((html) => {
+          const doc = new DOMParser().parseFromString(html, 'text/html')
+          const seen = new Set()
+          doc.querySelectorAll('link[rel="stylesheet"][href], link[rel="modulepreload"][href], script[src]').forEach((el) => {
+            const href = el.getAttribute('href') || el.getAttribute('src') || ''
+            if (!href.startsWith('/') || seen.has(href)) return
+            seen.add(href)
+            const link = document.createElement('link')
+            link.rel = 'prefetch'
+            link.as = el.tagName === 'SCRIPT' ? 'script' : 'style'
+            link.href = href
+            document.head.appendChild(link)
+          })
+        })
+        .catch(() => { /* 预取失败不影响切换 */ })
     }
     switchBtns.forEach((btn) => {
       btn.setAttribute('href', target)
@@ -129,6 +150,8 @@
       })
       btn.addEventListener('pointerenter', prefetch)
       btn.addEventListener('focus', prefetch)
+      btn.addEventListener('pointerdown', prefetch)
+      btn.addEventListener('touchstart', prefetch, { passive: true })
     })
   }
 
