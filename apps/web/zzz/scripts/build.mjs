@@ -347,7 +347,8 @@ if(!raw)return;
 var d=JSON.parse(raw);
 if(!d||typeof d.x!=='number')return;
 sessionStorage.removeItem('amu-theme-switch');
-if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+// 主题切换的圆扩散是站点主人明确要求保留的交互：即使系统上报
+// prefers-reduced-motion: reduce（Windows“动画效果”关闭），也照常播放。
 var canMask=(window.CSS&&CSS.supports&&CSS.supports('mask-image','radial-gradient(#000,#fff)'))||(window.CSS&&CSS.supports&&CSS.supports('-webkit-mask-image','radial-gradient(#000,#fff)'));
 if(!canMask)return;
 var x=Number(d.x)||0,y=Number(d.y)||0;

@@ -55,3 +55,10 @@
 
 - `transition-after-overlay-c2z.jpg`：经典 → ZZZ（第一次），圆内 ZZZ 页面。
 - `transition-after-overlay-z2c.jpg`：ZZZ → 经典，圆内经典页面。
+
+## 2026-11-16 再次跟进：Windows“动画效果”关闭
+
+反馈“完全没有圆扩散”。线上复现：浏览器 `prefers-reduced-motion: reduce` 为 true（Windows 关闭动画效果），
+而 arrival 脚本当时在这条分支上直接 return，所以只剩路由切换、没有圆。已改为**主题切换的圆扩散
+始终播放**（站内其他动画仍按系统设置降级）。
+`transition-after-reduced-motion.jpg` 是 `reducedMotion: reduce` 下的截帧：圆内能看到完整 ZZZ 页面。
