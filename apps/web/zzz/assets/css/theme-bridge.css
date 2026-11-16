@@ -10,22 +10,30 @@
 
 /* -------- 主题切换按钮 -------- */
 .theme-switch {
+  /* 与经典站的 .theme-toggle 共用同一套几何：fixed 在视口右上角，
+     位置/尺寸/圆角不随 ZZZ 导航栏布局变化，切换时按钮不跳、圆心一致。 */
+  position: fixed;
+  top: 10px;
+  right: 16px;
+  z-index: 95;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  height: 42px;
-  padding: 0 14px 0 12px;
+  justify-content: center;
+  gap: 6px;
+  width: 116px;
+  height: 34px;
+  padding: 0 10px;
   border: 1px solid var(--zzz-n-35);
+  border-radius: 8px;
   background: transparent;
   color: var(--zzz-white);
   font-family: var(--zzz-font-mono);
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   text-decoration: none;
   cursor: pointer;
-  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
   transition: background-color var(--zzz-dur-base), color var(--zzz-dur-base),
     border-color var(--zzz-dur-base), transform var(--zzz-dur-base);
 }
@@ -34,7 +42,7 @@
   background: var(--zzz-white);
   color: var(--zzz-black);
   border-color: var(--zzz-white);
-  transform: translateY(-1px);
+  transform: scale(1.02);
 }
 .theme-switch:focus-visible {
   outline: 2px solid var(--zzz-accent);
@@ -49,11 +57,8 @@
   line-height: 1;
 }
 .theme-switch__dot {
-  width: 5px;
-  height: 5px;
-  flex: none;
-  background: var(--zzz-accent);
-  border-radius: 50%;
+  /* 固定宽度按钮里不再塞装饰点，保证和经典站的按钮内容宽度一致 */
+  display: none;
 }
 .theme-switch:hover .theme-switch__dot {
   background: var(--zzz-black);
@@ -68,15 +73,15 @@
   }
 }
 
-@media (max-width: 1024px) {
-  .theme-switch__label {
-    display: none;
-  }
+@media (max-width: 720px) {
   .theme-switch {
-    width: 42px;
+    top: 8px;
+    right: 8px;
+    width: 44px;
+    height: 34px;
     padding: 0;
-    justify-content: center;
   }
+  .theme-switch__label,
   .theme-switch__dot {
     display: none;
   }

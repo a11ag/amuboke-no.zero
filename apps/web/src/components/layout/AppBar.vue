@@ -161,9 +161,9 @@ const emit = defineEmits<{
 }
 
 @media (max-width: 720px) {
-  /* 右上角主题切换按钮是绝对定位覆盖层：给居中导航留出 64px 安全区。 */
+  /* 右上角主题切换按钮是 fixed 覆盖层：给居中导航留出 52px 安全区（44px 按钮 + 8px 边距）。 */
   .app-bar__centered {
-    padding-right: 64px;
+    padding-right: 52px;
   }
 }
 
