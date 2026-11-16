@@ -23,7 +23,7 @@
 - **经典站** `/`：Vue 3 + Vuetify 3 + Vite SSG，浅色极客风。
 - **ZZZ 主题** `/zzz/`：纯 HTML / CSS / JS，绝区零视觉语言；源在 `apps/web/zzz/`。
 
-点击右上角 `ZZZ` / `CLASSIC` 时，以按钮中心为圆心做圆形扩散，跨文档 View Transition 裁切揭幕（不支持的浏览器退化为同款圆形帘幕）。文章、图集、音轨、项目、友链、关于各路由一一对应；文章页保留点赞 + Giscus 评论；favicon / theme-color 随主题切换。两套主题共用 `public/images`、`public/img` 的图片，切换命中缓存，不重复下载。
+点击右上角 `ZZZ` / `CLASSIC` 时，以按钮中心为圆心做圆形扩散：落地页先铺旧主题底色，再用 CSS mask 圆形挖洞把新页面露出来；不依赖 View Transition，所有支持 mask 的浏览器每次切换都一致。文章、图集、音轨、项目、友链、关于各路由一一对应；文章页保留点赞 + Giscus 评论；favicon / theme-color 随主题切换。两套主题共用 `public/images`、`public/img` 的图片，切换命中缓存，不重复下载。
 
 ```bash
 cd apps/web

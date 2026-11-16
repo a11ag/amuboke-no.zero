@@ -13,8 +13,6 @@
 
   const $ = (sel, root = document) => root.querySelector(sel)
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)]
-  const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  const supportsCrossDocVT = 'onpageswap' in window && 'onpagereveal' in window
 
   // ZZZ 文章 slug → 经典站 slug（只有这两篇换过名字）
   const CLASSIC_POST_SLUGS = {
@@ -61,28 +59,6 @@
     document.head.appendChild(link)
   }
 
-  function optInCrossDocVT() {
-    if (document.getElementById('amu-vt-optin')) return
-    const style = document.createElement('style')
-    style.id = 'amu-vt-optin'
-    style.textContent = '@view-transition { navigation: auto; }'
-    document.head.appendChild(style)
-  }
-
-  // 没有跨文档 View Transition 时的圆形帘幕：从触点铺满，再导航。
-  function curtainFallback(url, payload) {
-    const el = document.createElement('div')
-    el.className = 'theme-curtain'
-    el.style.setProperty('--curtain-x', payload.x + 'px')
-    el.style.setProperty('--curtain-y', payload.y + 'px')
-    el.style.setProperty('--curtain-r', payload.r + 'px')
-    el.style.setProperty('--theme-curtain-bg', '#f0f2f5')
-    el.style.setProperty('--theme-curtain-ink', '#1a1d24')
-    el.innerHTML = '<span>AMU LIVE STYLE</span>'
-    document.body.appendChild(el)
-    window.setTimeout(() => window.location.assign(url), 450)
-  }
-
   function goClassic(url, btn) {
     // 首访启动帘幕还在时按钮不可见；避免把帘幕截进圆形快照。
     if (document.documentElement.classList.contains('booting')) return
@@ -98,15 +74,7 @@
     setFavicon('/favicon.ico')
     const themeColor = document.querySelector('meta[name="theme-color"]')
     if (themeColor) themeColor.setAttribute('content', '#f0f2f5')
-    if (reduced()) {
-      window.location.assign(url)
-      return
-    }
-    if (!supportsCrossDocVT) {
-      curtainFallback(url, payload)
-      return
-    }
-    optInCrossDocVT()
+    // 圆扩散在目标页的 arrival 脚本里完成；这里只负责记录圆心并导航。
     window.location.assign(url)
   }
 

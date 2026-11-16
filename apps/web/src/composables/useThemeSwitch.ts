@@ -1,10 +1,10 @@
-// 经典站 → ZZZ 主题：路由映射 + 从按钮触点圆形扩散的跨文档切换。
+// 经典站 → ZZZ 主题：路由映射 + 从按钮触点圆形扩散。
 //
-// 两个主题都是独立的静态页面（/ 与 /zzz/），所以用跨文档 View Transition：
-//   1. 点击时把按钮圆心 / 半径 / 滚动位置写进 sessionStorage
-//   2. 给当前文档注入 @view-transition，让浏览器接管导航快照
-//   3. 目标页在 <head> 里同步注入圆形裁切动画（见 index.html）
-// 不支持跨文档 View Transition 的浏览器退化为同款圆形帘幕。
+// 两个主题都是独立的静态页面（/ 与 /zzz/）。点击时把按钮圆心 / 半径 /
+// 滚动位置写进 sessionStorage；目标页在 <head> 里先铺一层「旧主题底色」，
+// 再用 CSS mask 的圆形挖洞把新页面露出来（见 index.html 的 arrival 脚本）。
+// 不依赖跨文档 View Transition，所以每次切换、每个支持 mask 的浏览器
+// 都能得到同样稳定的圆扩散，不会出现一闪而过或有时有效有时无效。
 
 const ZZZ_POST_SLUGS: Record<string, string> = {
   'about-me': 'about',
@@ -26,15 +26,6 @@ export function toZzzPath(path: string): string {
   return '/zzz/'
 }
 
-function supportsCrossDocVT(): boolean {
-  return (
-    typeof window !== 'undefined' &&
-    'onpageswap' in window &&
-    'onpagereveal' in window &&
-    !window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  )
-}
-
 function setFavicon(href: string, type: string): void {
   document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]').forEach((el) => el.remove())
   const link = document.createElement('link')
@@ -42,25 +33,6 @@ function setFavicon(href: string, type: string): void {
   link.type = type
   link.href = href
   document.head.appendChild(link)
-}
-
-function optInCrossDocVT(): void {
-  if (document.getElementById('amu-vt-optin')) return
-  const style = document.createElement('style')
-  style.id = 'amu-vt-optin'
-  style.textContent = '@view-transition { navigation: auto; }'
-  document.head.appendChild(style)
-}
-
-function curtainFallback(url: string, payload: { x: number; y: number; r: number }): void {
-  const el = document.createElement('div')
-  el.className = 'theme-curtain'
-  el.style.setProperty('--curtain-x', `${payload.x}px`)
-  el.style.setProperty('--curtain-y', `${payload.y}px`)
-  el.style.setProperty('--curtain-r', `${payload.r}px`)
-  el.innerHTML = '<span>AMU ARCHIVE</span>'
-  document.body.appendChild(el)
-  window.setTimeout(() => window.location.assign(url), 450)
 }
 
 export interface ThemeSwitchPayload {
@@ -103,11 +75,8 @@ export function switchToZzz(button: HTMLElement): void {
   setFavicon('/zzz/assets/img/favicon.svg', 'image/svg+xml')
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#0a0a0a')
 
-  if (!supportsCrossDocVT()) {
-    curtainFallback(url, payload)
-    return
-  }
-  optInCrossDocVT()
+  // 圆扩散由目标页的 arrival 脚本完成（旧主题底色 + 圆形挖洞），
+  // 不依赖跨文档 View Transition，因此每次切换、每个支持 mask 的浏览器都一致。
   window.location.assign(url)
 }
 

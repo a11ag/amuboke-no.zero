@@ -41,3 +41,17 @@
 - `transition-after-fix-z2c.jpg`：落地页把入场动画钉到终态后，圆形里的经典页内容完整。
 - `transition-after-fix-c2z.jpg`：第一次经典 → ZZZ，圆形里的 ZZZ 内容完整。
 - `transition-after-fix-c2z-throttled.jpg`：1.5 Mbps / 180 ms 限速下的第一次切换，仍能看到完整扩散。
+
+## 2026-11-16 再次跟进：改成不依赖 View Transition 的确定性圆扩散
+
+上一版把希望寄托在跨文档 View Transition 上，真机反复切换时仍然会出现“有时有圆、有时一闪而过”。
+最终改为**在落地页做圆**：目标页在 `<head>` 里先铺一层旧主题底色（经典站浅色网格 / ZZZ 深色），
+再用 CSS `mask-image` 的圆形挖洞从按钮圆心把新页面露出来，560ms 后移除覆盖层。
+不再注入 `@view-transition`，所以：
+
+- 不依赖浏览器的跨文档 VT 支持/时序；
+- 每次切换（第一次、反复切换、两个方向）都走同一条路径；
+- 页面在覆盖层下面已经加载完，圆里看到的是完整内容。
+
+- `transition-after-overlay-c2z.jpg`：经典 → ZZZ（第一次），圆内 ZZZ 页面。
+- `transition-after-overlay-z2c.jpg`：ZZZ → 经典，圆内经典页面。

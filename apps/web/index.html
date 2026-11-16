@@ -7,8 +7,9 @@
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <meta name="description" content="个人博客 · 极客风骨架">
     <meta name="theme-color" content="#f0f2f5">
-    <!-- 主题切换落地页：从 ZZZ 主题切回经典站时，用按钮圆心做圆形裁切揭幕。
-         必须同步执行、在首帧前注入，否则跨文档 View Transition 会退回默认交叉淡化。 -->
+    <!-- 主题切换落地页：从对端主题切回来时，用“旧主题底色 + 圆形挖洞”把新页面露出来。
+         不依赖跨文档 View Transition，任何支持 mask 的浏览器每次切换都有同样的圆扩散；
+         脚本在 head 里同步插入覆盖层，首帧就被旧底色盖住，不会先闪一下新页面。 -->
     <script>
       (() => {
         try {
@@ -16,20 +17,34 @@
           if (!raw) return
           const data = JSON.parse(raw)
           if (!data || typeof data.x !== 'number') return
-          const root = document.documentElement
-          root.style.setProperty('--amu-vt-x', data.x + 'px')
-          root.style.setProperty('--amu-vt-y', data.y + 'px')
-          root.style.setProperty('--amu-vt-r', data.r + 'px')
-          const style = document.createElement('style')
-          style.id = 'amu-vt-style'
-          style.textContent =
-            '@view-transition{navigation:auto}' +
-            '::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}' +
-            '::view-transition-new(root){animation:amu-theme-reveal 560ms cubic-bezier(.22,1,.36,1) both}' +
-            '@keyframes amu-theme-reveal{from{clip-path:circle(0 at var(--amu-vt-x) var(--amu-vt-y))}to{clip-path:circle(var(--amu-vt-r) at var(--amu-vt-x) var(--amu-vt-y))}}'
-          document.head.appendChild(style)
-          // 主题切过来是为了看“圆形裁切里的新页面”，不是看首页自己的入场动画：
-          // 把 home-rise 系列直接钉在终态，避免快照里的内容是透明/半透明。
+          sessionStorage.removeItem('amu-theme-switch')
+          if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
+          const maskSupported =
+            (window.CSS && CSS.supports && CSS.supports('mask-image', 'radial-gradient(#000,#fff)')) ||
+            (window.CSS && CSS.supports && CSS.supports('-webkit-mask-image', 'radial-gradient(#000,#fff)'))
+          if (!maskSupported) return
+
+          const x = Number(data.x) || 0
+          const y = Number(data.y) || 0
+          const r =
+            Number(data.r) ||
+            Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y))
+          const from = data.from === 'zzz' ? 'zzz' : 'classic'
+          const oldBg = from === 'zzz' ? '#0a0a0a' : '#f0f2f5'
+          const oldPattern =
+            from === 'zzz'
+              ? 'radial-gradient(circle at 85% 15%, rgba(226,58,30,.18), transparent 55%)'
+              : 'repeating-linear-gradient(to right, rgba(165,192,212,.35) 0 2px, transparent 2px 28px), repeating-linear-gradient(to bottom, rgba(165,192,212,.35) 0 2px, transparent 2px 28px)'
+          const overlay = document.createElement('div')
+          overlay.setAttribute('aria-hidden', 'true')
+          overlay.style.cssText =
+            'position:fixed;inset:0;z-index:2147483600;pointer-events:none;' +
+            'background-color:' + oldBg + ';background-image:' + oldPattern + ';' +
+            'background-size:' + (from === 'zzz' ? 'auto' : '28px 28px') + ';' +
+            '-webkit-mask-image:radial-gradient(circle at ' + x + 'px ' + y + 'px, transparent 0px, transparent 0px, #000 0.5px);' +
+            'mask-image:radial-gradient(circle at ' + x + 'px ' + y + 'px, transparent 0px, transparent 0px, #000 0.5px)'
+          document.documentElement.appendChild(overlay)
+
           const settle = () => {
             const selectors = [
               '.home-page__hero', '.home-page__brand', '.home-page__tagline',
@@ -42,22 +57,37 @@
               el.style.transform = 'none'
             })
           }
-          if (document.readyState === 'loading') {
-            addEventListener('DOMContentLoaded', settle, { once: true })
-          } else {
+
+          let begun = false
+          const begin = () => {
+            if (begun) return
+            begun = true
             settle()
+            if (typeof data.sy === 'number' && data.sy > 0) {
+              window.scrollTo(0, data.sy)
+            }
+            const t0 = performance.now()
+            const step = (now) => {
+              const p = Math.min(1, (now - t0) / 560)
+              const eased = 1 - Math.pow(1 - p, 3)
+              const rr = (eased * r).toFixed(2)
+              const mask =
+                'radial-gradient(circle at ' + x + 'px ' + y + 'px, transparent 0px, transparent ' +
+                rr + 'px, #000 ' + (Number(rr) + 0.5).toFixed(2) + 'px)'
+              overlay.style.webkitMaskImage = mask
+              overlay.style.maskImage = mask
+              if (p < 1) requestAnimationFrame(step)
+              else overlay.remove()
+            }
+            requestAnimationFrame(step)
           }
-          if (typeof data.sy === 'number' && data.sy > 0) {
-            addEventListener('pagereveal', () => window.scrollTo(0, data.sy), { once: true })
+          if (document.readyState === 'loading') {
+            addEventListener('DOMContentLoaded', begin, { once: true })
+          } else {
+            begin()
           }
-          const cleanup = () => document.getElementById('amu-vt-style')?.remove()
-          addEventListener('pagereveal', (event) => {
-            const vt = event.viewTransition
-            if (vt) vt.finished.finally(cleanup)
-          }, { once: true })
-          // 过渡被跳过/中断时也要把一次性样式收掉，避免影响下一次导航。
-          setTimeout(cleanup, 2600)
-          sessionStorage.removeItem('amu-theme-switch')
+          // 慢资源也不让旧底色永久盖住页面
+          setTimeout(begin, 5000)
         } catch (_) {}
       })()
     </script>
