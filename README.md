@@ -16,6 +16,22 @@
 | Markdown | 自写轻量 loader (.md + frontmatter) |
 | 包管理 | pnpm |
 
+## 主题切换（经典 ↔ ZZZ）
+
+站点现在有两套完整主题，右上角按钮切换：
+
+- **经典站** `/`：Vue 3 + Vuetify 3 + Vite SSG，浅色极客风。
+- **ZZZ 主题** `/zzz/`：纯 HTML / CSS / JS，绝区零视觉语言；源在 `apps/web/zzz/`。
+
+点击右上角 `ZZZ` / `CLASSIC` 时，以按钮中心为圆心做圆形扩散，跨文档 View Transition 裁切揭幕（不支持的浏览器退化为同款圆形帘幕）。文章、图集、音轨、项目、友链、关于各路由一一对应；文章页保留点赞 + Giscus 评论；favicon / theme-color 随主题切换。两套主题共用 `public/images`、`public/img` 的图片，切换命中缓存，不重复下载。
+
+```bash
+cd apps/web
+pnpm build   # vite-ssg build 之后自动生成 dist/zzz
+```
+
+Cloudflare Pages 部署的是 `apps/web/dist`，必须包含 `dist/zzz/` 这一层；`pnpm build` 已包含。
+
 ## 项目结构
 
 ```

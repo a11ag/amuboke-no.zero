@@ -3,8 +3,10 @@
 // AGENTS.md §5 #8: 暗色下 outlined 边框刺眼；这里用 flat（无边框、半透明底）
 // AGENTS.md §2: 这个组件归 layout/，由 app.vue 引用
 // 单元 4 Todo 2: 固定磨砂导航只保留通道链接，品牌/Bilibili 留给 hero。
-// 2026-10-01 人类决定：站点固定浅色主题，主题切换开关已移除。
+// 2026-10-01 人类决定：经典站固定浅色（不恢复 Vuetify dark）。
+// 2026-11-16：右上角新增 ZZZ 主题切换，切的是独立页面 /zzz/，不是 Vuetify dark。
 import { useRoute } from 'vue-router'
+import ThemeToggle from '@/components/layout/ThemeToggle.vue'
 
 const route = useRoute()
 
@@ -36,6 +38,7 @@ const emit = defineEmits<{
     class="app-bar"
     fixed
   >
+    <ThemeToggle />
     <div class="app-bar__centered">
     <nav class="app-bar__nav" aria-label="主导航">
       <router-link
@@ -155,6 +158,13 @@ const emit = defineEmits<{
 }
 .search-btn svg {
   display: block;
+}
+
+@media (max-width: 720px) {
+  /* 右上角主题切换按钮是绝对定位覆盖层：给居中导航留出 64px 安全区。 */
+  .app-bar__centered {
+    padding-right: 64px;
+  }
 }
 
 @media (max-width: 640px) {
