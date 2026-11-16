@@ -18,7 +18,9 @@
           const data = JSON.parse(raw)
           if (!data || typeof data.x !== 'number') return
           sessionStorage.removeItem('amu-theme-switch')
-          if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
+          // 主题切换是站点主人明确要求保留的交互：即使 Windows 关了“动画效果”
+          // （浏览器上报 prefers-reduced-motion: reduce），这次圆扩散也照常播放。
+          // 站内其他动画仍然按系统设置降级。
           const maskSupported =
             (window.CSS && CSS.supports && CSS.supports('mask-image', 'radial-gradient(#000,#fff)')) ||
             (window.CSS && CSS.supports && CSS.supports('-webkit-mask-image', 'radial-gradient(#000,#fff)'))
