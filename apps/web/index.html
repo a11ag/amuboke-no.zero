@@ -6,6 +6,42 @@
     <title>amuboke-no.zero</title>
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <meta name="description" content="个人博客 · 极客风骨架">
+    <meta name="theme-color" content="#f0f2f5">
+    <!-- 主题切换落地页：从 ZZZ 主题切回经典站时，用按钮圆心做圆形裁切揭幕。
+         必须同步执行、在首帧前注入，否则跨文档 View Transition 会退回默认交叉淡化。 -->
+    <script>
+      (() => {
+        try {
+          const raw = sessionStorage.getItem('amu-theme-switch')
+          if (!raw) return
+          const data = JSON.parse(raw)
+          if (!data || typeof data.x !== 'number') return
+          const root = document.documentElement
+          root.style.setProperty('--amu-vt-x', data.x + 'px')
+          root.style.setProperty('--amu-vt-y', data.y + 'px')
+          root.style.setProperty('--amu-vt-r', data.r + 'px')
+          const style = document.createElement('style')
+          style.id = 'amu-vt-style'
+          style.textContent =
+            '@view-transition{navigation:auto}' +
+            '::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}' +
+            '::view-transition-new(root){animation:amu-theme-reveal 560ms cubic-bezier(.22,1,.36,1) both}' +
+            '@keyframes amu-theme-reveal{from{clip-path:circle(0 at var(--amu-vt-x) var(--amu-vt-y))}to{clip-path:circle(var(--amu-vt-r) at var(--amu-vt-x) var(--amu-vt-y))}}'
+          document.head.appendChild(style)
+          if (typeof data.sy === 'number' && data.sy > 0) {
+            addEventListener('pagereveal', () => window.scrollTo(0, data.sy), { once: true })
+          }
+          const cleanup = () => document.getElementById('amu-vt-style')?.remove()
+          addEventListener('pagereveal', (event) => {
+            const vt = event.viewTransition
+            if (vt) vt.finished.finally(cleanup)
+          }, { once: true })
+          // 过渡被跳过/中断时也要把一次性样式收掉，避免影响下一次导航。
+          setTimeout(cleanup, 2600)
+          sessionStorage.removeItem('amu-theme-switch')
+        } catch (_) {}
+      })()
+    </script>
     <!--
       Boot bootstrap. Runs before any bundle so the light theme is on <html>
       before first paint, and so the unit-7 startup splash can be gated without
