@@ -516,36 +516,3 @@
   scrollbar-color: rgba(0, 0, 0, 0.20) rgba(0, 0, 0, 0.05);
 }
 
-/* ---------------------------------------------------------------
-   主题切换兜底帘幕（不支持跨文档 View Transition 的浏览器）。
-   JS 在按钮触点注入 --curtain-x/y/r，这里只负责用圆形铺满。
-   --------------------------------------------------------------- */
-.theme-curtain {
-  position: fixed;
-  inset: 0;
-  z-index: 2147483600;
-  display: grid;
-  place-items: center;
-  background: var(--theme-curtain-bg, #0a0a0a);
-  color: var(--theme-curtain-ink, #efefef);
-  pointer-events: none;
-  clip-path: circle(0 at var(--curtain-x, 50%) var(--curtain-y, 50%));
-  animation: amu-curtain-expand 480ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-.theme-curtain span {
-  font-family: var(--theme-font-mono);
-  font-size: 12px;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  opacity: 0.85;
-}
-@keyframes amu-curtain-expand {
-  to {
-    clip-path: circle(var(--curtain-r, 150vmax) at var(--curtain-x, 50%) var(--curtain-y, 50%));
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .theme-curtain {
-    display: none;
-  }
-}
