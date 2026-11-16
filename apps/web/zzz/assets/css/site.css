@@ -51,7 +51,15 @@ html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
   scrollbar-color: var(--zzz-ink-500) var(--zzz-paper-2);
+  /* 和经典站一致：始终为滚动条留位，并使用同样的细滚动条宽度，
+     固定定位的主题按钮在两个主题里落在同一个 x。 */
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
 }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--zzz-n-35); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--zzz-n-55); }
 
 body {
   margin: 0;
@@ -207,7 +215,7 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2
 .nav__link.is-active { background: var(--zzz-white); color: var(--zzz-black); transform: scale(1.04); }
 .nav__link.is-active b { opacity: 0.55; }
 
-.nav__tools { display: flex; align-items: center; gap: 8px; flex: none; }
+.nav__tools { display: flex; align-items: center; gap: 8px; flex: none; padding-right: 132px; }
 .iconbtn {
   display: grid;
   place-items: center;
@@ -1777,6 +1785,7 @@ html.booting { overflow: hidden; }
 
 @media (max-width: 1024px) {
   .nav__links { display: none; }
+  .nav__tools { margin-left: auto; }
   .nav__burger { display: grid; }
   .nav__inner { height: 68px; }
   .hero { min-height: auto; padding-top: clamp(28px, 4.5vh, 54px); }
@@ -1834,6 +1843,7 @@ html.booting { overflow: hidden; }
 @media (max-width: 760px) {
   :root { --rail: 0px; }
   .nav__inner { height: 60px; padding: 0 16px; }
+  .nav__tools { padding-right: 52px; }
   .brand__mark { font-size: 20px; }
   .nav__cta { display: none; }
   .ahead { padding: 0 16px 42px; min-height: 0; }

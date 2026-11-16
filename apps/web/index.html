@@ -26,6 +26,10 @@
             (window.CSS && CSS.supports && CSS.supports('-webkit-mask-image', 'radial-gradient(#000,#fff)'))
           if (!maskSupported) return
 
+          // 告诉经典站 router：这次是主题切换落地，滚动位置由 arrival 脚本恢复，
+          // 不要让 router 的初始 scrollBehavior 再滚到顶部（会造成 ZZZ→经典 跳一下）。
+          window.__amuThemeArrival = true
+
           const x = Number(data.x) || 0
           const y = Number(data.y) || 0
           const r =
@@ -60,14 +64,7 @@
             })
           }
 
-          let begun = false
-          const begin = () => {
-            if (begun) return
-            begun = true
-            settle()
-            if (typeof data.sy === 'number' && data.sy > 0) {
-              window.scrollTo(0, data.sy)
-            }
+          const start = () => {
             const t0 = performance.now()
             const step = (now) => {
               const p = Math.min(1, (now - t0) / 560)
@@ -83,13 +80,33 @@
             }
             requestAnimationFrame(step)
           }
-          if (document.readyState === 'loading') {
-            addEventListener('DOMContentLoaded', begin, { once: true })
-          } else {
-            begin()
+          let begun = false
+          const begin = () => {
+            if (begun) return
+            begun = true
+            settle()
+            const kick = () => {
+              if (typeof data.sy === 'number' && data.sy > 0) {
+                // 用即时滚动，避免目标页的 scroll-behavior: smooth 在圆扩散时还在滚。
+                const html = document.documentElement
+                const prev = html.style.scrollBehavior
+                html.style.scrollBehavior = 'auto'
+                window.scrollTo(0, data.sy)
+                html.style.scrollBehavior = prev
+              }
+              // 等布局稳定（字体/首帧）再开始，避免圆扩散时页面还在跳。
+              requestAnimationFrame(() => requestAnimationFrame(start))
+            }
+            if (document.fonts && document.fonts.ready) {
+              document.fonts.ready.then(kick, kick)
+            } else {
+              kick()
+            }
           }
+          if (document.readyState === 'complete') begin()
+          else addEventListener('load', begin, { once: true })
           // 慢资源也不让旧底色永久盖住页面
-          setTimeout(begin, 5000)
+          setTimeout(begin, 6000)
         } catch (_) {}
       })()
     </script>

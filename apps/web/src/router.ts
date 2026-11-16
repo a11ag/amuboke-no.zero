@@ -131,6 +131,12 @@ export const routes: (RouteRecordRaw & RouteMeta)[] = [
 // 但运行时用户 back/forward 时需要恢复滚动位置。
 // Strategy: manual — we restore via sessionStorage key per path.
 export const scrollBehavior: RouterScrollBehavior = (to, from, savedPosition) => {
+  // 主题切换落地页的滚动由 index.html 的 arrival 脚本恢复（见 amu-theme-switch）；
+  // 这里返回 false，避免初始导航把刚恢复的位置又滚回顶部，造成“跳一下”。
+  if (typeof window !== 'undefined' && (window as any).__amuThemeArrival) {
+    ;(window as any).__amuThemeArrival = false
+    return false
+  }
   if (savedPosition) {
     // back/forward navigation: restore saved scroll position
     return savedPosition
@@ -189,8 +195,9 @@ export function registerSeoGuard(router: any) {
       const key = 'scroll_' + (from.name as string)
       sessionStorage.setItem(key, String(window.scrollY))
     }
-    // Restore scroll position if we have a saved one for this route
-    if (to.name && typeof window !== 'undefined') {
+    // Restore scroll position if we have a saved one for this route.
+    // 主题切换落地时跳过：arrival 脚本已经按来源页的 sy 恢复，避免二次滚动。
+    if (to.name && typeof window !== 'undefined' && !(window as any).__amuThemeArrival) {
       const key = 'scroll_' + (to.name as string)
       const saved = sessionStorage.getItem(key)
       if (saved !== null) {

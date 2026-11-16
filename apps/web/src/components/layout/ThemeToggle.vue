@@ -38,18 +38,21 @@ function onIntent(): void {
 
 <style scoped>
 .theme-toggle {
-  position: absolute;
-  top: 50%;
-  right: var(--theme-spacing-md);
-  z-index: 3;
+  /* 两个主题共用同一套几何：fixed 在视口右上角，按钮不会随导航栏布局变化而移动，
+     圆形扩散的圆心也就始终一致。尺寸/圆角/边框与 ZZZ 主题的 .theme-switch 对齐。 */
+  position: fixed;
+  top: 10px;
+  right: 16px;
+  z-index: 1001;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  height: 30px;
+  width: 116px;
+  height: 34px;
   padding: 0 10px;
-  transform: translateY(-50%);
   border: 1px solid var(--theme-border);
-  border-radius: var(--theme-radius-md);
+  border-radius: 8px;
   background: var(--theme-scrim);
   color: var(--theme-on-surface);
   font-family: var(--theme-font-mono);
@@ -64,7 +67,7 @@ function onIntent(): void {
   color: var(--theme-primary);
   border-color: color-mix(in srgb, var(--theme-primary) 55%, transparent);
   background: color-mix(in srgb, var(--theme-primary) 10%, transparent);
-  transform: translateY(-50%) scale(1.03);
+  transform: scale(1.02);
 }
 .theme-toggle:focus-visible {
   outline: 2px solid var(--theme-primary);
@@ -88,12 +91,16 @@ function onIntent(): void {
 .theme-toggle__label {
   line-height: 1;
 }
-@media (max-width: 640px) {
+@media (max-width: 720px) {
   .theme-toggle {
-    right: var(--theme-spacing-sm);
-    height: 28px;
-    padding: 0 8px;
-    gap: 4px;
+    top: 8px;
+    right: 8px;
+    width: 44px;
+    height: 34px;
+    padding: 0;
+  }
+  .theme-toggle__label {
+    display: none;
   }
 }
 </style>
