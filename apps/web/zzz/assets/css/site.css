@@ -1960,25 +1960,6 @@ html.booting { overflow: hidden; }
   .codeblock code { font-size: 11.5px; }
 }
 
-/* ---------------------------------------------------------------- motion preferences */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-  .pulse { animation: none; }
-  .reveal { opacity: 1; transform: none; }
-  .boot { display: none !important; }
-  .pager__dot.is-active { height: 12px; }
-  .postcard:hover .postcard__media img,
-  .albumcard:hover .albumcard__media img { transform: none; }
-  .hero__portrait { transform: none; }
-}
-
 /* ---------------------------------------------------------------- print */
 @media print {
   .nav, .foot, .pager, .wipe, .boot, .search, .article__back, .toc, .postcard__go { display: none !important; }

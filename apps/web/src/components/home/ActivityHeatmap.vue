@@ -350,8 +350,4 @@ function onKey(e: KeyboardEvent, row: number, col: number) {
 }
 .ah-cell[data-tooltip]:hover::after,
 .ah-cell[data-tooltip]:focus-visible::after { display: block; }
-
-@media (prefers-reduced-motion: reduce) {
-  .ah-cell { transition: none; }
-}
 </style>

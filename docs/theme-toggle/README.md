@@ -60,7 +60,7 @@
 
 反馈“完全没有圆扩散”。线上复现：浏览器 `prefers-reduced-motion: reduce` 为 true（Windows 关闭动画效果），
 而 arrival 脚本当时在这条分支上直接 return，所以只剩路由切换、没有圆。已改为**主题切换的圆扩散
-始终播放**（站内其他动画仍按系统设置降级）。
+始终播放**；其余站点动效的兼容处理见 `docs/motion`。
 `transition-after-reduced-motion.jpg` 是 `reducedMotion: reduce` 下的截帧：圆内能看到完整 ZZZ 页面。
 
 ## 2026-11-16 按钮几何统一 + 切换不跳
