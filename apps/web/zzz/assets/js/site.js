@@ -4,7 +4,6 @@
 
   const $ = (sel, root = document) => root.querySelector(sel)
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)]
-  const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
   const root = document.body?.dataset.root || ''
   const isHome = document.body?.classList.contains('page--home')
 
@@ -23,7 +22,6 @@
     window.addEventListener('load', () => setTimeout(finish, 900), { once: true })
     boot.addEventListener('click', () => { clearTimeout(timer); finish() })
     window.addEventListener('keydown', (e) => { if (e.key === 'Escape' || e.key === ' ') { clearTimeout(timer); finish() } }, { once: true })
-    if (reduced()) { clearTimeout(timer); finish() }
   } else if (boot) {
     boot.remove()
   }
@@ -152,7 +150,7 @@
 
   /* ---------------------------------------------------------- wipe transition */
   const wipe = $('.wipe')
-  if (wipe && !reduced()) {
+  if (wipe) {
     window.addEventListener('pageshow', () => wipe.classList.remove('is-on'))
     document.addEventListener('click', (e) => {
       const a = e.target.closest('a[href]')
@@ -195,7 +193,7 @@
   }
   $$('[data-pager]').forEach((b) => b.addEventListener('click', () => {
     const target = $(b.dataset.pager)
-    target?.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' })
+    target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }))
   if (sections.length) {
     const first = sections.find((s) => s.el.dataset.accent)
@@ -204,7 +202,7 @@
 
   /* ---------------------------------------------------------- reveal */
   const revealTargets = $$('.postcard, .albumcard, .projrow, .friendcard, .photo, .article__kv, .listenrow, .friendnote, .indexcallout > div, .char__info, .char__art')
-  if (!reduced() && 'IntersectionObserver' in window) {
+  if ('IntersectionObserver' in window) {
     revealTargets.forEach((el, i) => { el.classList.add('reveal'); el.style.setProperty('--i', String(i % 4)) })
     const io = new IntersectionObserver((obs) => {
       obs.forEach((o) => { if (o.isIntersecting) { o.target.classList.add('is-in'); io.unobserve(o.target) } })
@@ -214,7 +212,7 @@
 
   /* ---------------------------------------------------------- parallax ghost */
   const ghosts = $$('.hero__bgtype, .ahead__ghost, .article__ghost, .panel__ghost, .char__ghost')
-  if (ghosts.length && !reduced() && window.matchMedia('(min-width: 900px)').matches) {
+  if (ghosts.length && window.matchMedia('(min-width: 900px)').matches) {
     let ticking = false
     const apply = () => {
       const y = window.scrollY

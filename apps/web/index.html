@@ -555,11 +555,10 @@
          curtain does NOT degrade under prefers-reduced-motion. The first entry
          gets the complete boot sequence on every machine (Windows "animation
          effects" off makes every Chromium report reduce, which used to hide the
-         feature from its own author). Everything else on the site — the unit-4
-         home entrance, the route-loading mark — still honours reduce in its own
-         component CSS. To restore a moving-free curtain, re-add a
-         `@media (prefers-reduced-motion: reduce)` block here that pins
-         `animation/transition/transform` and stretches the progress fill. */
+         feature from its own author). The same policy now covers the rest of the
+         site's motion — the home entrance, route-loading mark, ZZZ wipe/reveal/
+         parallax and the theme circle — see docs/motion. To make the site
+         motion-free again, re-add the reduced-motion blocks listed there. */
     </style>
     <noscript>
       <!-- SSG ships the full page in the HTML, so with JS off the curtain is

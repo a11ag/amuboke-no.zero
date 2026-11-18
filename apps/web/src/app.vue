@@ -164,8 +164,4 @@ html.boot-docking .home-page__hero-portrait { visibility: hidden; }
   animation: route-loading-spin 700ms linear infinite;
 }
 @keyframes route-loading-spin { to { transform: rotate(360deg); } }
-
-@media (prefers-reduced-motion: reduce) {
-  .route-loading__mark { animation: none; }
-}
 </style>

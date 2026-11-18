@@ -519,7 +519,7 @@ ${page === 'notfound' ? '<meta name="robots" content="noindex">' : ''}
 <link rel="stylesheet" href="${r('assets/css/site.css')}">
 <link rel="stylesheet" href="${r('assets/css/theme-bridge.css')}">
 <link rel="alternate" type="application/rss+xml" title="AMU ARCHIVE RSS" href="${r('rss.xml')}">
-${isHome ? `<script>if(!sessionStorage.getItem('amu-boot')&&!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.dataset.boot='on'</script>` : ''}
+${isHome ? `<script>if(!sessionStorage.getItem('amu-boot'))document.documentElement.dataset.boot='on'</script>` : ''}
 <script>${THEME_ARRIVAL_SCRIPT}</script>
 </head>
 <body class="page page--${page} ${bodyClass}" data-page="${page}" data-depth="${depth}" data-root="${'../'.repeat(depth)}" data-zzz-accent="${accent || 'orange'}">
